@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><COMPONENTS author="Checklist MODULE_admin" description="" name="050.rule_create_items_2.xml" site="https&#x3a;&#x2f;&#x2f;dev.onevizion.com" ts="" ><RULES>
+ <RULES_ITEM>
+  <IS_ASYNC>0</IS_ASYNC>
+  <IS_ENABLED>1</IS_ENABLED>
+  <RULE>Add Items from Template</RULE>
+  <RULE_CLASS_ID>1</RULE_CLASS_ID>
+  <RULE_ID>100009375</RULE_ID>
+  <RULE_TYPE>
+   <RULE_TYPE_ID>18</RULE_TYPE_ID>
+   <RULE_TYPE>After Trackor Create</RULE_TYPE>
+   <ID_FIELD>XITOR_ID</ID_FIELD>
+   <TEMPLATE_SQL>select xitor_type_id as &quot;Xitor Type ID&quot;,
+       xitor_type as &quot;Xitor Type&quot;,
+       xitor_type_id as &quot;Xitor Type Id&quot;
+from xitor_type</TEMPLATE_SQL>
+   <TYPE_LABELS>
+    <T_LABEL>
+     <APP_LANG_ID>0</APP_LANG_ID>
+     <APP_LABEL_ID>6420</APP_LABEL_ID>
+     <LABEL_TEXT>Trackor Created (After)</LABEL_TEXT>
+    </T_LABEL>
+    <T_LABEL>
+     <APP_LANG_ID>1</APP_LANG_ID>
+     <APP_LABEL_ID>6420</APP_LABEL_ID>
+     <LABEL_TEXT>Trackor Created (After)</LABEL_TEXT>
+    </T_LABEL>
+    <T_LABEL>
+     <APP_LANG_ID>5</APP_LANG_ID>
+     <APP_LABEL_ID>6420</APP_LABEL_ID>
+     <LABEL_TEXT>Trackor Created (After)</LABEL_TEXT>
+    </T_LABEL>
+    <T_LABEL>
+     <APP_LANG_ID>10</APP_LANG_ID>
+     <APP_LABEL_ID>6420</APP_LABEL_ID>
+     <LABEL_TEXT>Trackor Created (After)</LABEL_TEXT>
+    </T_LABEL>
+    <T_LABEL>
+     <APP_LANG_ID>11</APP_LANG_ID>
+     <APP_LABEL_ID>6420</APP_LABEL_ID>
+     <LABEL_TEXT>Trackor Created (After)</LABEL_TEXT>
+    </T_LABEL>
+   </TYPE_LABELS>
+   <DESC_LABELS>
+    <T_LABEL>
+     <APP_LANG_ID>0</APP_LANG_ID>
+     <APP_LABEL_ID>6449</APP_LABEL_ID>
+     <LABEL_TEXT>Executed when a new Trackor is created.</LABEL_TEXT>
+    </T_LABEL>
+    <T_LABEL>
+     <APP_LANG_ID>1</APP_LANG_ID>
+     <APP_LABEL_ID>6449</APP_LABEL_ID>
+     <LABEL_TEXT>Executed when a new Trackor is created.</LABEL_TEXT>
+    </T_LABEL>
+    <T_LABEL>
+     <APP_LANG_ID>5</APP_LANG_ID>
+     <APP_LABEL_ID>6449</APP_LABEL_ID>
+     <LABEL_TEXT>Executed when a new Trackor is created.</LABEL_TEXT>
+    </T_LABEL>
+    <T_LABEL>
+     <APP_LANG_ID>10</APP_LANG_ID>
+     <APP_LABEL_ID>6449</APP_LABEL_ID>
+     <LABEL_TEXT>Executed when a new Trackor is created.</LABEL_TEXT>
+    </T_LABEL>
+    <T_LABEL>
+     <APP_LANG_ID>11</APP_LANG_ID>
+     <APP_LABEL_ID>6449</APP_LABEL_ID>
+     <LABEL_TEXT>Executed when a new Trackor is created.</LABEL_TEXT>
+    </T_LABEL>
+   </DESC_LABELS>
+  </RULE_TYPE>
+  <SQL_TEXT>declare
+v_template_trackor_tid xitor.xitor_id%type;
+v_template_item_tid    xitor.xitor_id%type;
+v_new_item_tid         xitor.xitor_id%type;
+v_new_item_key         varchar2(1000); 
+
+cursor cur_item_list(p_template_trackor_tid xitor.xitor_id%type) is
+    select child_id
+      from relation
+     where relation_type_id = id.get(&apos;id.checklist.rel.checklistitem&apos;)
+       and parent_id = p_template_trackor_tid;
+begin
+    
+    select template_xitor_id
+    into v_template_trackor_tid
+    from xitor
+    where xitor_id = :xitor_id;
+    
+    if v_template_trackor_tid is null then
+        return;
+    end if;
+    
+    open cur_item_list(v_template_trackor_tid); loop
+        fetch cur_item_list into v_template_item_tid;
+        exit when cur_item_list%notfound;
+        
+        v_new_item_tid := util.newtrackor(trackortypeid  =&gt; id.checklistitem.tt, 
+                                          templatetrackorid =&gt; v_template_item_tid);
+       util.newrelation(:xitor_id, v_new_item_tid);
+       v_new_item_key := pkg_xitor.generate_xitor_key(v_new_item_tid);
+
+    end loop;
+    close cur_item_list;
+end;</SQL_TEXT>
+  <WARNING_LABEL/>
+  <RULE_CLASS_PARAM_VALS/>
+  <RULE_HTTPCALLS/>
+  <RULE_HTTPCALL_PARAMS/>
+  <BPD_ITEMS>
+   <T_BPD_ITEM>
+    <ITEM_ID>10000620037</ITEM_ID>
+    <PKEY>100009375</PKEY>
+    <ITEM_TYPE_ID>9</ITEM_TYPE_ID>
+    <ITEM_STATUS_ID>1</ITEM_STATUS_ID>
+    <BLOB_DATA/>
+    <PROGRAM_ID>1002777</PROGRAM_ID>
+    <NAME>Add Items from Template</NAME>
+    <APP_LABEL/>
+   </T_BPD_ITEM>
+  </BPD_ITEMS>
+  <RULE_GEOCODING/>
+  <RULE_MAP_SNIPPETS/>
+  <PROGRAM_ID>1002777</PROGRAM_ID>
+  <RULE_TYPE_ID>18</RULE_TYPE_ID>
+  <RULE_TOWER_GROUPS/>
+  <COMPONENT_PACKAGES>
+   <T_BPL_COMP_PKG>
+    <COMPONENT_ID>4</COMPONENT_ID>
+    <OBJECT_ID>100009375</OBJECT_ID>
+    <COMPONENTS_PACKAGE_ID>101703</COMPONENTS_PACKAGE_ID>
+    <NAME>VP - Checklist Management</NAME>
+    <PROGRAM_ID>1002777</PROGRAM_ID>
+    <BPD_ITEMS/>
+    <IS_LOCKED>0</IS_LOCKED>
+   </T_BPL_COMP_PKG>
+  </COMPONENT_PACKAGES>
+  <CONFIG_FIELD_IDNUMS/>
+  <TASK_DATE_IDNUMS/>
+  <TASK_IDNUMS/>
+  <TRACKOR_TYPE_IDNUMS>
+   <VARCHAR2>Checklist</VARCHAR2>
+  </TRACKOR_TYPE_IDNUMS>
+  <RELATION_TYPE_IDNUMS/>
+  <WP_TEMPLATE_IDNUMS/>
+  <WF_TEMPLATE_IDNUMS/>
+  <IMPORT_IDNUMS/>
+  <REPORT_IDNUMS/>
+  <COMPONENT_LABELS/>
+ </RULES_ITEM>
+</RULES>
+</COMPONENTS>
